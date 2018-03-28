@@ -17,12 +17,14 @@ class VerifyThread(threading.Thread):
                 command = message[:bang_index]
                 data = message[bang_index + 1:]
 
-                if command == "COMFIRM":
+                if command == "CONFIRM":
+                    print(self.client.last_hash())
                     self.socket.send(self.client.last_hash())
                 elif command == "ADD":
                     self.client.add_hash(data)
                 else:
                     print("IMPROPER MESSAGE FORMAT")
+                message = self.socket.recv(MSG_SIZE)
         except:
             self.socket.close()
 
@@ -35,9 +37,10 @@ class AddThread(threading.Thread):
     def run(self):
         try:
             message = raw_input("")
-            while message != "GOODBYE":
+            while message != "GOODBYE" and message != '':
                 self.socket.send(message)
                 message = raw_input("")
+            print("Client is now listen only")
         except:
             self.socket.close()
 
@@ -52,17 +55,16 @@ class Client:
         
         self.block_hashes = []
 
-        self.lock = threading.Lock()
-
     def add_hash(self, new_hash):
         self.block_hashes.append(new_hash)
-        print(self.block_hashes[-1])
 
     def last_hash(self):
         return self.block_hashes[-1]
 
     def handle_first_message(self):
         message = self.verify_socket.recv(MSG_SIZE)
+        while message == '':
+            message = self.verify_socket.recv(MSG_SIZE)
         bang_index = message.find('!')
         last_hash = message[bang_index + 1:]
         self.add_hash(last_hash)
@@ -71,6 +73,7 @@ class Client:
         try:
             self.verify_socket.connect((self.ip, self.verify_port))
             self.handle_first_message()
+
             vt = VerifyThread(self, self.verify_socket)
             vt.start()
             

@@ -1,4 +1,5 @@
 import hashlib, socket, sys
+import blockchain_messages_pb2
 
 MSG_SIZE = 512
 

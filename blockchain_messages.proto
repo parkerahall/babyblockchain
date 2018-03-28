@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package blockchain;
+
+message ChainMessage {
+    enum MessageType {
+        CONFIRM = 0;
+        ADD = 1;
+        ENTRY = 2;
+    }
+
+    message AddMessage {
+        string last_hash = 1;
+    }
+
+    message EntryMessage {
+        enum EntryType {
+            REWARD = 0;
+            TRANSFER = 1;
+        }
+
+        string sender = 1;
+        string recipient = 2;
+        int32 amount = 3;
+    }
+}

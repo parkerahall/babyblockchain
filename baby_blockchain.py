@@ -1,38 +1,3 @@
-import hashlib, socket, threading, sys
-
-MSG_SIZE = 512
-
-class AddThread(threading.Thread):
-    def __init__(self, chain, sock):
-        super(AddThread, self).__init__()
-        self.chain = chain
-        self.socket = sock
-
-    def run(self):
-        try:
-            data = self.socket.recv(MSG_SIZE)
-            while data != '\n' and data != '':
-                self.chain.add_data(data.strip())
-                print(self.chain)
-                data = self.socket.recv(MSG_SIZE)
-        finally:
-            self.socket.close()
-
-class StartThread(threading.Thread):
-    def __init__(self, chain, sock):
-        super(StartThread, self).__init__()
-        self.chain = chain
-        self.socket = sock
-
-    def run(self):
-        try:
-            last_block = self.chain.last_block.string_to_hash()
-            last_hash = self.chain.hash_func(last_block)
-            message = "ADD!" + last_hash
-            self.socket.send(message)
-        except:
-            self.socket.close()
-
 class Block:
     def __init__(self, prev_hash, size):
         self.data       = []
@@ -127,7 +92,9 @@ class Chain:
         verified = 0
         for client in self.verify_list:
             client.send("CONFIRM!")
-            hash_check = client.rcv(MSG_SIZE)
+            hash_check = client.recv(MSG_SIZE)
+            print(hash_check)
+            print(h)
             if hash_check == h:
                 verified += 1
         return verified == total
@@ -135,54 +102,9 @@ class Chain:
     def current_block(self):
         return self.last_block
 
-    def serve(self):
-        threads = []
-
-        verifier = socket.socket()
-        verifier.bind(('localhost', self.verify_port))
-        verifier.listen(1)
-
-        server = socket.socket()
-        server.bind(('localhost', self.serve_port))
-        server.listen(1)
-
-        try:
-            while True:
-                v, _ = verifier.accept()
-                st = StartThread(self, v)
-                st.start()
-
-                client, addr = server.accept()
-                ip, port = addr
-                print("CONNECTION MADE AT " + ip + ": " + str(port))
-
-                at = AddThread(self, client)
-                threads.append(at)
-                at.start()
-        finally:
-            server.close()
-            print("\nGOODBYE")
-
     def __str__(self):
         block_strings = [str(x) for x in self.chain]
         return '\n'.join(block_strings)
 
     def __repr__(self):
         return self.__str__()
-
-def hash_func(inp):
-    return hashlib.sha256(inp).hexdigest()
-
-if __name__ == "__main__":
-    serve_port = 1200
-    verify_port = 1201
-    mine_port = 1202
-    if len(sys.argv) == 3:
-        serve_port = int(sys.argv[1])
-        verify_port = int(sys.argv[2])
-        mine_port  = int(sys.argv[2])
-    c = Chain(hash_func, 3, 2, serve_port, verify_port, mine_port)
-    c.serve()
-
-
-
