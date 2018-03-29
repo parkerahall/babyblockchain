@@ -25,20 +25,14 @@ class Block:
         return self.__str__()
 
 class Chain:
-    def __init__(self, hash_func, block_size, num_zeros, serve, verify, mine):
+    def __init__(self, hash_func, block_size, num_zeros):
         self.hash_func      =   hash_func
         self.block_size     =   block_size
         self.num_zeros      =   num_zeros
-        self.serve_port     =   serve
-        self.verify_port    =   verify
-        self.mine_port      =   mine
 
         self.chain          =   [Block.genesis_block(block_size)]
         self.last_block     =   self.chain[0]
         self.lock           =   threading.Lock()
-
-        self.miner          =   self.init_miner()
-        self.verify_list    =   []
 
     def init_miner(self):
         mine_server = socket.socket()
