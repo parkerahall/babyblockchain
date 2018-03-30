@@ -2,25 +2,40 @@ syntax = "proto3";
 
 package blockchain;
 
-message ChainMessage {
-    enum MessageType {
-        CONFIRM = 0;
-        ADD = 1;
-        ENTRY = 2;
+message ConnectMessage {
+    int32 update = 1;
+    int32 verify = 2;
+    Chain chain = 3;
+}
+
+message MineMessage {
+    int32 difficulty = 1;
+    string hash = 2;
+}
+
+message UpdateMessage {
+    enum UpdateType {
+        ENTRY = 0;
+        BLOCK = 1;
     }
 
-    message AddMessage {
-        string last_hash = 1;
-    }
+    UpdateType type = 1;
+    Entry entry = 2;
+    Block block = 3;
+}
 
-    message EntryMessage {
-        enum EntryType {
-            REWARD = 0;
-            TRANSFER = 1;
-        }
+message Entry {
+    string sender = 1;
+    string receiver = 2;
+    int32 amount = 3;
+}
 
-        string sender = 1;
-        string recipient = 2;
-        int32 amount = 3;
-    }
+message Block {
+    string prev_hash = 1;
+    repeated Entry entries = 3;
+}
+
+message Chain {
+    int32 block_size = 1;
+    repeated Block blocks = 2;
 }
