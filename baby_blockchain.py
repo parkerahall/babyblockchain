@@ -75,7 +75,7 @@ class Chain:
 
         blocks = []
         for proto_block in proto.blocks:
-            prev_hash = proto_block.prev_hash
+            prev_hash = str(proto_block.prev_hash)
             new_block = Block(prev_hash, block_size)
             for proto_entry in proto_block.entries:
                 s = proto_entry.sender
@@ -132,7 +132,6 @@ class Chain:
 
     def hash(self):
         block_hashes = [b.string_to_hash() for b in self.chain]
-        print(block_hashes)
         return self.hash_func(str(block_hashes))
 
     def last_block_hash(self):

@@ -25,17 +25,17 @@ class MiningSocket:
 				last_hash = message.hash
 
 				prefix = '0' * difficulty
-
 				nonce = 0
 				while True:
 					test_hash = hash_func(last_hash + str(nonce))
-					if test_hash[:num_zeros] == prefix:
+					if test_hash[:difficulty] == prefix:
+						print("MINED: " + str(nonce) + ", " + test_hash)
 						break
 					nonce += 1
 
 				self.socket.send(str(nonce))
 				message_bytes = self.socket.recv(MSG_SIZE)
-		except:
+		finally:
 			self.socket.close()
 
 if __name__ == "__main__":

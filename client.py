@@ -39,13 +39,15 @@ class UpdateThread(threading.Thread):
                     self.client.chain.add_data(entry)
                 elif update_message.type == pc.UpdateMessage.BLOCK:
                     proto_block = update_message.block
-                    prev_hash = proto_block.prev_hash
+                    prev_hash = str(proto_block.prev_hash)
                     self.client.chain.add_new_block(prev_hash)
                     for proto_entry in proto_block.entries:
                         entry = Entry.init_from_proto(proto_entry)
                         self.client.chain.add_data(entry)
                 else:
                     print("IMPROPER MESSAGE FORMAT")
+            print(self.client.chain)
+            message_bytes = self.socket.recv(MSG_SIZE)
 
 class AddThread(threading.Thread):
     def __init__(self, client, sock):
@@ -67,6 +69,9 @@ class AddThread(threading.Thread):
             entry_bytes = proto_entry.SerializeToString()
 
             self.socket.send(entry_bytes)
+
+            print(self.client.chain)
+
             message = raw_input("")
 
 class Client:
@@ -89,7 +94,6 @@ class Client:
         self.chain = bbc.Chain.init_from_proto(proto_chain, hash_func)
 
         self.connect_socket.send("SUCCESS")
-        print(self.chain)
 
     def run(self):
         self.connect_socket.connect((self.ip, self.connect_port))
