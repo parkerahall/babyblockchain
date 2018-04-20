@@ -5,12 +5,21 @@ package blockchain;
 message ConnectMessage {
     int32 update = 1;
     int32 verify = 2;
-    Chain chain = 3;
+    int32 client_id = 3;
+    Chain chain = 4;
+
+    int32 mine = 5;
+    int32 miner_id = 6;
 }
 
 message MineMessage {
     int32 difficulty = 1;
     string hash = 2;
+}
+
+message NonceMessage {
+    int32 nonce = 1;
+    int32 miner_id = 2;
 }
 
 message UpdateMessage {

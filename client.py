@@ -89,6 +89,7 @@ class Client:
         connect_message.ParseFromString(connect_bytes)
         self.update_port = connect_message.update
         self.verify_port = connect_message.verify
+        self.client_id = connect_message.client_id
 
         proto_chain = connect_message.chain
         self.chain = bbc.Chain.init_from_proto(proto_chain, hash_func)
