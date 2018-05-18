@@ -59,6 +59,7 @@ class AddThread(threading.Thread):
         message = raw_input("")
         while message != "GOODBYE" and message != '':
             sender, receiver, amount = message.split(',')
+            amount = int(amount)
             entry = bbc.Entry(sender, receiver, amount)
             self.client.chain.add_data(entry)
 
